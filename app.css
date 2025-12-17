@@ -1,0 +1,23 @@
+#cesiumContainer {
+  width: 100%;
+  height: 100%;
+}
+
+.hud {
+  position: absolute;
+  color: cyan;
+  font-family: monospace;
+  background: rgba(0,0,0,0.6);
+  padding: 10px;
+  border: 1px solid cyan;
+}
+
+.left {
+  top: 20px;
+  left: 20px;
+}
+
+.right {
+  bottom: 20px;
+  right: 20px;
+}
