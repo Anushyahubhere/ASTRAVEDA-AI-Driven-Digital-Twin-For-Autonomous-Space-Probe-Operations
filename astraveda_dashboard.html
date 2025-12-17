@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ASTRAVEDA – AI-DRIVEN DIGITAL TWIN FOR AUTONOMOUS SPACE PROBE OPERATIONS</title>
+
+<!-- CESIUM -->
+<link href="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.111/Build/Cesium/Cesium.js"></script>
+
+<style>
+:root{
+  --bg:#0b1220;
+  --panel:#0f1b2d;
+  --border:#1f2f4a;
+  --accent:#00e0ff;
+  --green:#38ef7d;
+  --red:#ff4d4d;
+  --text:#cbd5e1;
+}
+*{box-sizing:border-box;font-family:Inter,Segoe UI,Arial}
+body{margin:0;background:var(--bg);color:var(--text)}
+
+header{
+  padding:16px 24px;
+  font-size:20px;
+  font-weight:700;
+  border-bottom:1px solid var(--border);
+}
+
+.tabs{
+  display:flex;
+  gap:14px;
+  padding:10px 14px;
+}
+.tabs button{
+  background:#0b1f36;
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:8px 16px;
+  border-radius:10px;
+  cursor:pointer;
+}
+.tabs button.active{
+  border-color:var(--accent);
+  color:var(--accent);
+}
+
+.dashboard{
+  display:none;
+  grid-template-columns:320px 1fr 320px;
+  gap:14px;
+  padding:14px;
+}
+.dashboard.active{display:grid}
+
+.panel{
+  background:linear-gradient(180deg,#0f1b2d,#0a1424);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px;
+}
+.panel.small{min-height:150px}
+
+.mapPanel{
+  grid-column:2;
+  height:72vh;
+  padding:0;
+}
+
+#cesiumContainer{width:100%;height:100%;border-radius:14px}
+
+.title{font-size:13px;color:#7dd3fc;margin-bottom:6px}
+.value{font-size:20px;font-weight:700}
+.list div{font-size:13px;padding:3px 0}
+
+canvas{width:100%;height:140px}
+
+.log{
+  font-size:12px;
+  height:120px;
+  overflow:auto;
+}
+
+.voice{
+  color:var(--green);
+  font-size:12px;
+}
+
+footer{
+  text-align:center;
+  font-size:11px;
+  opacity:.6;
+  padding:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>ASTRAVEDA – AI-DRIVEN DIGITAL TWIN FOR AUTONOMOUS SPACE PROBE OPERATIONS</header>
+
+<div class="tabs">
+  <button class="active" onclick="showTab(0)">Mission Control</button>
+  <button onclick="showTab(1)">Probe Network</button>
+  <button onclick="showTab(2)">Science & Discovery</button>
+</div>
+
+<!-- ================= TAB 1 ================= -->
+<div class="dashboard active">
+
+<div>
+  <div class="panel small">
+    <div class="title">Mission Status</div>
+    <div class="value">NOMINAL</div>
+    <div class="list">
+      <div>Active Probes: 8</div>
+      <div>Uptime: <span id="uptime">00:00</span></div>
+    </div>
+  </div>
+
+  <div class="panel small">
+    <div class="title">Energy System</div>
+    <div class="value"><span id="energy">95</span>%</div>
+    <canvas id="energyChart"></canvas>
+  </div>
+
+  <div class="panel small">
+    <div class="title">AI Alerts</div>
+    <div id="aiAlert" class="voice">All systems stable</div>
+  </div>
+</div>
+
+<div class="panel mapPanel">
+  <div id="cesiumContainer"></div>
+</div>
+
+<div>
+  <div class="panel small">
+    <div class="title">Telemetry</div>
+    <canvas id="telemetryChart"></canvas>
+  </div>
+
+  <div class="panel small">
+    <div class="title">Selected Probe</div>
+    <div id="probeInfo">Click a probe</div>
+  </div>
+
+  <div class="panel small">
+    <div class="title">Mission Logs</div>
+    <div class="log" id="logs"></div>
+  </div>
+</div>
+
+</div>
+
+<!-- ================= TAB 2 ================= -->
+<div class="dashboard">
+
+<div class="panel small">
+  <div class="title">Inter-Probe Communication</div>
+  <div class="list">
+    <div>Relay Chains Active</div>
+    <div>Packet Exchange: LIVE</div>
+  </div>
+</div>
+
+<div class="panel small">
+  <div class="title">Probe Health Heatmap</div>
+  <canvas id="healthChart"></canvas>
+</div>
+
+<div class="panel small">
+  <div class="title">AI Learning Engine</div>
+  <div class="list">
+    <div>Pattern Learning: ACTIVE</div>
+    <div>Autonomous Decisions: ENABLED</div>
+  </div>
+</div>
+
+</div>
+
+<!-- ================= TAB 3 ================= -->
+<div class="dashboard">
+
+<div class="panel small">
+  <div class="title">Mission Target</div>
+  <div class="list">
+    <div>Earth → Moon Relay</div>
+    <div>Deep Space Simulation</div>
+  </div>
+</div>
+
+<div class="panel small">
+  <div class="title">Science Discoveries</div>
+  <div class="list">
+    <div>Radiation Mapping</div>
+    <div>Surface Analysis</div>
+  </div>
+</div>
+
+<div class="panel small">
+  <div class="title">AI Explanation</div>
+  <div class="list">
+    <div>Analyzing orbital stability</div>
+    <div>Predicting energy decay</div>
+  </div>
+</div>
+
+</div>
+
+<footer>ASTRAVEDA © Digital Twin Mission Control</footer>
+
+<script>
+/* -------- TABS -------- */
+function showTab(i){
+  document.querySelectorAll(".dashboard").forEach((d,idx)=>{
+    d.classList.toggle("active",idx===i);
+  });
+  document.querySelectorAll(".tabs button").forEach((b,idx)=>{
+    b.classList.toggle("active",idx===i);
+  });
+}
+
+/* -------- CESIUM -------- */
+Cesium.Ion.defaultAccessToken="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3YjI3OTBkZC01N2YyLTQ3NWItOGVkMi1lNDA3NDVlNGY3OTUiLCJpZCI6MzY5ODc0LCJpYXQiOjE3NjU4MDQwNjB9.D9aPH4p-IStuncmb_OgzJbrHtJPGDbOvnxaSHDlMiVQ";
+
+const viewer=new Cesium.Viewer("cesiumContainer",{timeline:false,animation:false});
+viewer.scene.globe.enableLighting=true;
+
+/* Moon */
+viewer.entities.add({
+  name:"Moon",
+  position:Cesium.Cartesian3.fromDegrees(80,0,384400000),
+  ellipsoid:{radii:new Cesium.Cartesian3(1737400,1737400,1737400),material:Cesium.Color.GRAY}
+});
+
+/* Probes */
+const probes=[];
+for(let i=1;i<=8;i++){
+  probes.push(viewer.entities.add({
+    name:"Probe-"+i,
+    position:Cesium.Cartesian3.fromDegrees(10*i,0,i*45000000),
+    point:{pixelSize:8,color:Cesium.Color.CYAN},
+    properties:{health:90+Math.random()*10}
+  }));
+}
+
+/* Click probe */
+const handler=new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+handler.setInputAction(e=>{
+  const p=viewer.scene.pick(e.position);
+  if(p&&p.id){
+    document.getElementById("probeInfo").innerHTML=`<b>${p.id.name}</b><br>Health: ${p.id.properties.health.getValue().toFixed(1)}%`;
+    viewer.flyTo(p.id);
+  }
+},Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+/* -------- TELEMETRY -------- */
+function chart(canvas,color){
+  const ctx=canvas.getContext("2d");
+  let data=[];
+  return setInterval(()=>{
+    data.push(Math.random()*100);
+    if(data.length>20)data.shift();
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle=color;
+    ctx.beginPath();
+    data.forEach((v,i)=>{
+      ctx.lineTo(i*(canvas.width/20),canvas.height-v);
+    });
+    ctx.stroke();
+  },1000);
+}
+chart(document.getElementById("telemetryChart"),"#00e0ff");
+chart(document.getElementById("energyChart"),"#38ef7d");
+chart(document.getElementById("healthChart"),"#ff4d4d");
+
+/* -------- LOGS + AI -------- */
+setInterval(()=>{
+  document.getElementById("logs").innerHTML+=`<div>AI Sync OK – ${new Date().toLocaleTimeString()}</div>`;
+  document.getElementById("logs").scrollTop=9999;
+},3000);
+
+/* -------- VOICE -------- */
+const speak=t=>speechSynthesis.speak(new SpeechSynthesisUtterance(t));
+setInterval(()=>{
+  document.getElementById("aiAlert").innerText="AI: Systems stable";
+  speak("All probes operating normally");
+},15000);
+
+/* -------- UPTIME -------- */
+let t=0;
+setInterval(()=>{
+  t++;
+  document.getElementById("uptime").innerText=new Date(t*1000).toISOString().substr(11,8);
+},1000);
+</script>
+
+</body>
+</html>
